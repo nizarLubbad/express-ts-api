@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import { userService } from "./user.service";
-import { UpdateUserDTO, CreateCoachDTO } from "./user.dto";
-import { ValidationError } from "../shared/errors";
+import type { Request, Response } from "express";
+import { userService } from "./user.service.js";
+import { UpdateUserDTO, CreateCoachDTO } from "./user.dto.js";
+import { ValidationError } from "../shared/errors.js";
 
 export class UserController {
   getMe(req: Request, res: Response) {
@@ -16,7 +16,9 @@ export class UserController {
   updateMe(req: Request, res: Response) {
     const validation = UpdateUserDTO.safeParse(req.body);
     if (!validation.success) {
-      throw new ValidationError(validation.error.errors[0].message);
+      throw new ValidationError(
+        validation.error.issues[0]?.message || "Validation failed"
+      );
     }
 
     const user = userService.updateProfile(req.user!.id, validation.data);
@@ -31,7 +33,9 @@ export class UserController {
   async createCoach(req: Request, res: Response) {
     const validation = CreateCoachDTO.safeParse(req.body);
     if (!validation.success) {
-      throw new ValidationError(validation.error.errors[0].message);
+      throw new ValidationError(
+        validation.error.issues[0]?.message || "Validation failed"
+      );
     }
 
     const coach = await userService.createCoach(validation.data);

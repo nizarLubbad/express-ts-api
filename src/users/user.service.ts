@@ -31,7 +31,11 @@ class UserService {
       }
     }
 
-    const updatedUser = this.userRepository.update(userId, data);
+    const filteredData = Object.fromEntries(
+      Object.entries(data).filter(([_, value]) => value !== undefined)
+    );
+
+    const updatedUser = this.userRepository.update(userId, filteredData);
     if (!updatedUser) {
       throw new NotFoundError("User not found");
     }
